@@ -60,7 +60,9 @@ def replace_keywords(doc, keywords):
         '{납품금액}': lambda k: format_number_with_commas(keywords.get('{납품금액}', '0')),
         '{상금한글}': lambda k: convert_number_to_korean(keywords.get('{상금}', '0')),
         '{상금}': lambda k: format_number_with_commas(keywords.get('{상금}', '0')),
-        '{일시}': lambda k: format_date_only(keywords.get('{일시}', ''))
+        '{일시}': lambda k: format_date_only(keywords.get('{일시}', '')),
+        '{지급금액}': lambda k: format_number_with_commas(keywords.get('{지급금액}', '0')),
+        '{과업일자}': lambda k: format_date_only(keywords.get('{과업일자}', ''))
     }
 
     for paragraph in doc.paragraphs:
