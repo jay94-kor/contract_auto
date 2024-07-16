@@ -6,29 +6,9 @@ from zipfile import ZipFile
 import os
 from io import BytesIO
 from docx import Document
-from sqlalchemy import create_engine, Column, String, Integer, Table, MetaData
-from sqlalchemy.orm import sessionmaker
 from datetime import datetime, date
 import re
 from pdf2image import convert_from_path
-
-# 데이터베이스 설정
-DATABASE_URL = "sqlite:///data/contracts.db"
-engine = create_engine(DATABASE_URL)
-metadata = MetaData()
-
-# 인력 테이블 정의
-workers = Table('workers', metadata,
-    Column('id', Integer, primary_key=True),
-    Column('name', String),
-    Column('date', String),
-    Column('position', String),
-    Column('rate', String)
-)
-
-metadata.create_all(engine)
-Session = sessionmaker(bind=engine)
-session = Session()
 
 def replace_keywords(doc, keywords):
     date_fields = ['{계약시작일}', '{계약마감일}', '{납품기일}']
