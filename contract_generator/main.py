@@ -142,12 +142,15 @@ def main():
     # 예시 엑셀 파일 제공
     st.markdown(f"### {selected_template} 예시 엑셀 템플릿")
     example_file_path = f'data/{selected_template_file.split(".")[0]}_Template.xlsx'
-    with open(example_file_path, 'rb') as file:
-        st.download_button(
-            label=f"{selected_template} 예시 엑셀 다운로드",
-            data=file,
-            file_name=f"{selected_template_file.split('.')[0]}_Template.xlsx"
-        )
+    if not os.path.exists(example_file_path):
+        st.error(f"엑셀 템플릿 파일을 찾을 수 없습니다: {example_file_path}")
+    else:
+        with open(example_file_path, 'rb') as file:
+            st.download_button(
+                label=f"{selected_template} 예시 엑셀 다운로드",
+                data=file,
+                file_name=f"{selected_template_file.split('.')[0]}_Template.xlsx"
+            )
 
     # 파일 업로드
     excel_file = st.file_uploader(f"{selected_template} 엑셀 파일 업로드", type="xlsx")
