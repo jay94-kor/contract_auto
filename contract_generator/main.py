@@ -116,8 +116,8 @@ def main():
 
     # 템플릿 선택
     template_options = {
-        "일용직 근로자 계약서": "Temporary Worker.docx",
         "일반 대행 용역 계약서": "General Service.docx",
+        "일용직 근로자 계약서": "Temporary Worker.docx",
         "수당지급 약정서": "Allowance Payment.docx",
         "상금지급 약정서": "Bonus Payment.docx"
     }
