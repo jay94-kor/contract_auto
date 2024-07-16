@@ -130,7 +130,7 @@ def main():
     selected_template_file = template_options[selected_template]
 
     # PDF 미리보기
-    pdf_path = f"data/{selected_template_file.split('.')[0]}.pdf"
+    pdf_path = os.path.join(os.path.dirname(__file__), f"data/{selected_template_file.split('.')[0]}.pdf")
     images = convert_pdf_to_images(pdf_path)
     if images:
         st.markdown(f"### {selected_template} 예시")
@@ -141,7 +141,7 @@ def main():
 
     # 예시 엑셀 파일 제공
     st.markdown(f"### {selected_template} 예시 엑셀 템플릿")
-    example_file_path = f'data/{selected_template_file.split(".")[0]}_Template.xlsx'
+    example_file_path = os.path.join(os.path.dirname(__file__), f'data/{selected_template_file.split(".")[0]}_Template.xlsx')
     if not os.path.exists(example_file_path):
         st.error(f"엑셀 템플릿 파일을 찾을 수 없습니다: {example_file_path}")
     else:
@@ -170,7 +170,7 @@ def main():
 
         zip_buffer = BytesIO()
         with ZipFile(zip_buffer, 'w') as zipf:
-            template_path = f"templates/{selected_template_file}"
+            template_path = os.path.join(os.path.dirname(__file__), f"templates/{selected_template_file}")
 
             for i, row in df.iterrows():
                 keywords = row.to_dict()
