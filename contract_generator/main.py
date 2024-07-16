@@ -12,6 +12,10 @@ import fitz  # PyMuPDF
 
 # PDF를 이미지로 변환하는 함수
 def convert_pdf_to_images(pdf_path):
+    if not os.path.exists(pdf_path):
+        st.error(f"PDF 파일을 찾을 수 없습니다: {pdf_path}")
+        return []
+    
     pdf_document = fitz.open(pdf_path)
     images = []
     for page_num in range(len(pdf_document)):
@@ -128,11 +132,12 @@ def main():
     # PDF 미리보기
     pdf_path = f"data/{selected_template_file.split('.')[0]}.pdf"
     images = convert_pdf_to_images(pdf_path)
-    st.markdown(f"### {selected_template} 예시")
-    cols = st.columns(2)
-    for i, image in enumerate(images):
-        with cols[i % 2]:
-            st.image(image, use_column_width=True)
+    if images:
+        st.markdown(f"### {selected_template} 예시")
+        cols = st.columns(2)
+        for i, image in enumerate(images):
+            with cols[i % 2]:
+                st.image(image, use_column_width=True)
 
     # 예시 엑셀 파일 제공
     st.markdown(f"### {selected_template} 예시 엑셀 템플릿")
