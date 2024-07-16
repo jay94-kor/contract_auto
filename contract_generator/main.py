@@ -8,7 +8,18 @@ from io import BytesIO
 from docx import Document
 from datetime import datetime, date
 import re
-from pdf2image import convert_from_path
+import fitz  # PyMuPDF
+
+# PDF를 이미지로 변환하는 함수
+def convert_pdf_to_images(pdf_path):
+    pdf_document = fitz.open(pdf_path)
+    images = []
+    for page_num in range(len(pdf_document)):
+        page = pdf_document.load_page(page_num)
+        pix = page.get_pixmap()
+        img_data = pix.tobytes("png")
+        images.append(img_data)
+    return images
 
 def replace_keywords(doc, keywords):
     date_fields = ['{계약시작일}', '{계약마감일}', '{납품기일}']
@@ -116,7 +127,7 @@ def main():
 
     # PDF 미리보기
     pdf_path = f"data/{selected_template_file.split('.')[0]}.pdf"
-    images = convert_from_path(pdf_path)
+    images = convert_pdf_to_images(pdf_path)
     st.markdown(f"### {selected_template} 예시")
     cols = st.columns(2)
     for i, image in enumerate(images):
