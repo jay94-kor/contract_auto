@@ -56,7 +56,10 @@ def replace_keywords(doc, keywords):
     special_keywords = {
         '{생년월일}': lambda k: convert_ssn_to_birthdate(keywords.get('{주민등록번호}', '')),
         '{오늘날짜}': lambda k: date.today().strftime('%Y-%m-%d'),
-        '{납품금액한글}': lambda k: convert_number_to_korean(keywords.get('{납품금액}', '0'))
+        '{납품금액한글}': lambda k: convert_number_to_korean(keywords.get('{납품금액}', '0')),
+        '{납품금액}': lambda k: format_number_with_commas(keywords.get('{납품금액}', '0')),
+        '{상금한글}': lambda k: convert_number_to_korean(keywords.get('{상금}', '0')),
+        '{상금}': lambda k: format_number_with_commas(keywords.get('{상금}', '0'))
     }
 
     for paragraph in doc.paragraphs:
@@ -104,6 +107,9 @@ def convert_part_to_korean(part):
         if digit != "0":
             result.append(digits[int(digit)] + units[3 - i])
     return ''.join(result)
+
+def format_number_with_commas(number):
+    return f"{int(number):,}"
 
 # 파일 이름 생성을 위한 함수
 def generate_filename(keywords, today):
