@@ -25,8 +25,16 @@ def convert_pdf_to_images(pdf_path):
         images.append(img_data)
     return images
 
+def calculate_contract_days(start_date, end_date):
+    start = pd.to_datetime(start_date)
+    end = pd.to_datetime(end_date)
+    days = (end - start).days + 1  # 종료일도 포함
+    return days
+
 def replace_keywords(doc, keywords):
     date_fields = ['{계약시작일}', '{계약마감일}', '{납품기일}']
+    number_fields = ['{지급금액}', '{납품금액}', '{상금}']
+    
     for paragraph in doc.paragraphs:
         for key, value in keywords.items():
             if key in paragraph.text:
@@ -36,6 +44,9 @@ def replace_keywords(doc, keywords):
                         paragraph.text = paragraph.text.replace(key, date_value)
                     except:
                         paragraph.text = paragraph.text.replace(key, str(value))
+                elif key in number_fields:
+                    formatted_value = format_number_with_commas(value)
+                    paragraph.text = paragraph.text.replace(key, formatted_value)
                 else:
                     paragraph.text = paragraph.text.replace(key, str(value))
     
@@ -50,6 +61,9 @@ def replace_keywords(doc, keywords):
                                 cell.text = cell.text.replace(key, date_value)
                             except:
                                 cell.text = cell.text.replace(key, str(value))
+                        elif key in number_fields:
+                            formatted_value = format_number_with_commas(value)
+                            cell.text = cell.text.replace(key, formatted_value)
                         else:
                             cell.text = cell.text.replace(key, str(value))
 
@@ -57,12 +71,15 @@ def replace_keywords(doc, keywords):
         '{생년월일}': lambda k: convert_ssn_to_birthdate(keywords.get('{주민등록번호}', '')),
         '{오늘날짜}': lambda k: date.today().strftime('%Y-%m-%d'),
         '{납품금액한글}': lambda k: convert_number_to_korean(keywords.get('{납품금액}', '0')),
-        '{납품금액}': lambda k: format_number_with_commas(keywords.get('{납품금액}', '0')),
         '{상금한글}': lambda k: convert_number_to_korean(keywords.get('{상금}', '0')),
-        '{상금}': lambda k: format_number_with_commas(keywords.get('{상금}', '0')),
         '{일시}': lambda k: format_date_only(keywords.get('{일시}', '')),
-        '{지급금액}': lambda k: format_number_with_commas(keywords.get('{지급금액}', '0')),
-        '{과업일자}': lambda k: format_date_only(keywords.get('{과업일자}', ''))
+        '{과업일자}': lambda k: format_date_only(keywords.get('{과업일자}', '')),
+        '{계약시작일}': lambda k: format_date_only(keywords.get('{계약시작일}', '')),
+        '{계약마감일}': lambda k: format_date_only(keywords.get('{계약마감일}', '')),
+        '{근무일}': lambda k: format_work_period(
+            keywords.get('{계약시작일}', ''),
+            keywords.get('{계약마감일}', '')
+        )
     }
 
     for paragraph in doc.paragraphs:
@@ -112,10 +129,22 @@ def convert_part_to_korean(part):
     return ''.join(result)
 
 def format_number_with_commas(number):
-    return f"{int(number):,}"
+    try:
+        return f"{int(float(number)):,}"
+    except ValueError:
+        return str(number)
 
 def format_date_only(datetime_str):
     return pd.to_datetime(datetime_str).strftime('%Y-%m-%d')
+
+def format_work_period(start_date, end_date):
+    try:
+        start = pd.to_datetime(start_date).strftime('%Y-%m-%d')
+        end = pd.to_datetime(end_date).strftime('%Y-%m-%d')
+        days = calculate_contract_days(start_date, end_date)
+        return f"{start} ~ {end} ({days}일간)"
+    except:
+        return "날짜 형식 오류"
 
 # 파일 이름 생성을 위한 함수
 def generate_filename(keywords, today):
